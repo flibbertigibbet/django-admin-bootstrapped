@@ -1,9 +1,45 @@
 {% load i18n %}
 <div class="actions" style="display:inline-block;">
     {% for field in action_form %}{% if field.label %}<span style="vertical-align:sub">{{ field.label }}</span> {% endif %}{{ field }}{% endfor %}
-    <button type="submit" class="btn" title="{% trans "Run the selected action" %}" name="index" value="{{ action_index|default:0 }}">{% trans "Go" %}</button>
+    <!-- Modal -->
+    <div class="modal fade" id="submitModal" tabindex="-1" role="dialog" 
+      aria-labelledby="Are you sure?" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" 
+              data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Are you sure?</h4>
+          </div>
+          <div id="submit-modal-body" class="modal-body lead">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+              data-dismiss="modal">Cancel</button>
+            <button type="submit" id="submit-button"
+              class="btn btn-primary">Yes</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a type="button" href="javascript:void(0)" name="index" class="btn btn-default"
+      onclick="confirm_change('{{ action_index|default:0 }}')">{% trans "Go" %}</a>
     {% if actions_selection_counter %}
-        <script type="text/javascript">var _actions_icnt="{{ cl.result_list|length|default:"0" }}";</script>
+        <script type="text/javascript">
+        var _actions_icnt="{{ cl.result_list|length|default:"0" }}";
+        function confirm_change(do_what) {
+          var modalText = document.getElementById("submit-modal-body");
+          var submitBtn = document.getElementById("submit-button");
+          modalText.innerHTML =  "Are you sure you want to do that now?";
+          submitBtn.name = do_what;
+          submitBtn.value = do_what;
+          $('#submitModal').modal({ keyboard: false });
+          return;
+        }
+        $('#submitModal').on('hide.bs.modal', function () {
+          $('.modal-backdrop').remove(); 
+        });
+        </script>
         <span class="action-counter" style="vertical-align:sub">{{ selection_note }}</span>
         {% if cl.result_count != cl.result_list|length %}
         <span class="all" style="vertical-align:sub">{{ selection_note_all }}</span>
